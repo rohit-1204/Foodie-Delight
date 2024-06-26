@@ -1,0 +1,161 @@
+<!-- <div> -->
+    <!-- <h2>Restaurants</h2>
+    <ul>
+      <li *ngFor="let restaurant of restaurants">
+        {{ restaurant.name }} - {{ restaurant.description }} - {{ restaurant.location }}
+        <button (click)="editRestaurant(restaurant)">Edit</button>
+        <button (click)="deleteRestaurant(restaurant.id)">Delete</button>
+      </li>
+    </ul>
+  
+    <h3>Add New Restaurant</h3>
+    <form (ngSubmit)="addRestaurant()">
+      <input [(ngModel)]="newRestaurant.name" name="name" placeholder="Name" required>
+      <input [(ngModel)]="newRestaurant.description" name="description" placeholder="Description" required>
+      <input [(ngModel)]="newRestaurant.location" name="location" placeholder="Location" required>
+      <button type="submit">Add</button>
+    </form>
+  
+    <div *ngIf="editingRestaurant">
+      <h3>Edit Restaurant</h3>
+      <form (ngSubmit)="updateRestaurant()">
+        <input [(ngModel)]="editingRestaurant.name" name="name" required>
+        <input [(ngModel)]="editingRestaurant.description" name="description" required>
+        <input [(ngModel)]="editingRestaurant.location" name="location" required>
+        <button type="submit">Update</button>
+      </form>
+    </div>
+  </div> -->
+  
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">FOODIEDELIGHT</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#"></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"></a>
+          </li>
+          
+          <li class="nav-item">
+            <a class="nav-link disabled" aria-disabled="true"></a>
+          </li>
+        </ul>
+        <form class="d-flex" role="search">
+          <input name="search" [(ngModel)]="serachText" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        </form>
+      </div>
+    </div>
+  </nav>
+  <div class="add m-2">
+    <button type="button" class="btn btn-success float-left" (click)="openModel(content)"><span class="add-button">+</span> Add</button>
+  </div>
+
+
+  <table class="table">
+    <thead>
+        <tr >
+            <th *ngFor="let col of cols; index as i" scope="col">{{col}}</th>
+          </tr>
+      </thead>
+      <tbody *ngIf="restaurants && restaurants">
+          <tr *ngFor="let restaurant of restaurants | filter:serachText">
+            <td>{{ restaurant.id }}</td>
+              <td>{{ restaurant.restaurantName }}</td>
+              <td>{{ restaurant.description }}</td>
+              <td>{{ restaurant.location }}</td>
+              
+      <td><div class="d-inline-block" ngbDropdown #myDrop="ngbDropdown">
+          <button
+              type="button"
+              class="btn btn-outline-primary me-2"
+              id="dropdownManual"
+              ngbDropdownAnchor
+              (focus)="myDrop.open()">	
+          </button>
+          <div ngbDropdownMenu aria-labelledby="dropdownManual">
+              <button class="btn-sm" ngbDropdownItem (click)="editRestaurant(restaurant,content)">Edit</button>
+              <button ngbDropdownItem (click)="deleteRestaurant(restaurant.id)">Delete</button>
+          </div>
+      </div></td>
+      
+  </tr>
+  <tr *ngIf="(restaurants | filter:serachText).length  == 0">
+      <td colspan="10" class="text-center"><ngb-alert [dismissible]="false">
+          <strong>No Restaurant Found !</strong> 
+      </ngb-alert></td>
+      
+    </tr>
+</tbody>
+</table>
+<nav aria-label="Page navigation example">
+  <ul class="pagination">
+      <li class="page-item"  (click)="prevPage()"  [class.disabled]="currentPage == 1"><a class="page-link">Previous</a></li>
+      <li class="page-item" (click)="numberClick(1)"><a  class="page-link" >1</a></li>
+      <li class="page-item" (click)="numberClick(2)"><a  class="page-link" >2</a></li>
+      <li class="page-item" (click)="numberClick(3)"><a  class="page-link" >3</a></li>
+      <li class="page-item" (click)="nextPage()" ><a class="page-link"  [class.disabled]="currentPage == totalPages" >Next</a></li>
+  </ul>
+</nav>
+
+<ng-template #content let-modal>
+	<div class="modal-header">
+		<h4 class="modal-title" id="modal-basic-title">{{header}}</h4>
+		<button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="restaurantForm">
+      <div class="form-group m-2">
+        <label for="restaurantName">Restaurant Name</label>
+        <input
+          type="text"
+          id="restaurantName"
+          class="form-control"
+          formControlName="restaurantName"
+          placeholder="Enter Restaurant Name"
+        />
+        <div *ngIf="restaurantForm.get('restaurantName')?.invalid && restaurantForm.get('restaurantName')?.touched" class="text-danger">
+          Restaurant Name is required.
+        </div>
+      </div>
+    
+      <div class="form-group m-2">
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          class="form-control"
+          formControlName="description"
+          placeholder="Enter Description"
+          rows="3"
+        ></textarea>
+        <div *ngIf="restaurantForm.get('description')?.invalid && restaurantForm.get('description')?.touched" class="text-danger">
+          Description is required.
+        </div>
+      </div>
+    
+      <div class="form-group m-2">
+        <label for="location">Location</label>
+        <input
+          type="text"
+          id="location"
+          class="form-control"
+          formControlName="location"
+          placeholder="Enter Your Location"
+        />
+        <div *ngIf="restaurantForm.get('location')?.invalid && restaurantForm.get('location')?.touched" class="text-danger">
+          Location is required.
+        </div>
+      </div>
+    </form>
+    
+	</div>
+	<div class="modal-footer">
+		<button type="button" [disabled]="restaurantForm.invalid" class="btn btn-success" (click)="addRestaurant(modal)">Save</button>
+	</div>
+</ng-template>
+  
